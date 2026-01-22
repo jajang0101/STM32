@@ -51,16 +51,12 @@ void I2C1_Write(uint8_t devAddr, uint8_t regAddr, uint8_t data){
 void I2C1_Read(uint8_t devAddr, uint8_t regAddr, uint8_t *buffer, uint8_t size) {
     while (I2C1->ISR & I2C_ISR_BUSY);
 
-    // Phase 1: Write the Register Address
-    // NBYTES=1, SADD=devAddr, RD_WRN=0 (Write), START=1
     I2C1->CR2 = (devAddr) | (1U << 16) | I2C_CR2_START;
 
     while (!(I2C1->ISR & I2C_ISR_TXIS));
     I2C1->TXDR = regAddr;
-    while (!(I2C1->ISR & I2C_ISR_TC)); // Wait for Transfer Complete
+    while (!(I2C1->ISR & I2C_ISR_TC)); //Wait for Transfer Complete
 
-    // Phase 2: Read Data (Repeated Start)
-    // NBYTES=size, SADD=devAddr, RD_WRN=1 (Read), START=1, AUTOEND=1
     I2C1->CR2 = (devAddr) | (size << 16) | I2C_CR2_RD_WRN | I2C_CR2_START | I2C_CR2_AUTOEND;
 
     for (uint8_t i = 0; i < size; i++) {
@@ -74,8 +70,8 @@ void I2C1_Read(uint8_t devAddr, uint8_t regAddr, uint8_t *buffer, uint8_t size) 
 uint8_t MPU6050_Init(){
 	I2C1_Init();
 
-	I2C1_Write(MPU6050_ADDR, 0x6B, 0x80); // Write 0x80 to PWR_MGMT_1 to Reset
-	for(volatile int i=0; i<500000; i++); // Short delay for reset to settle
+	I2C1_Write(MPU6050_ADDR, 0x6B, 0x80); //PWR_MGMT_1
+	for(volatile int i=0; i<500000; i++); 
 
 	//PWR_MGMT_1
 	I2C1_Write(MPU6050_ADDR, 0x6B, 0x00);

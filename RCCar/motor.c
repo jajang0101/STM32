@@ -20,6 +20,7 @@ void Motor_Init(){
     GPIOA->AFR[0] |= 1U<<24;
     GPIOA->AFR[0] |= 1U<<28;
 
+    //1kHz
     TIM3->PSC = (CK_INT/1000000U)-1;
     TIM3->ARR = SG90_PERIOD*1000U;
 
@@ -54,4 +55,12 @@ void Motor_Stop(){
     TIM3->CCR2 = 0;
     GPIOA->ODR &= ~(1U);
     GPIOA->ODR &= ~(1U<<1);
+}
+uint8_t TI3_Update(){
+    if(TIM3->SR & 1U){
+        TIM3->SR &= ~(1U);
+        return 1U;
+    } else {
+        return 0U;
+    }
 }
